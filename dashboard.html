@@ -305,23 +305,31 @@ document.getElementById("username").innerHTML=user
 // LOAD USER PHOTO
 
 
+// LOAD USER PHOTO
 
+let user = localStorage.getItem("username");
 let img = document.getElementById("userImage");
 
-if(username === "Satakshi"){
-    img.src = "images/satakshi.jpg";
+if(user){
+
+let u = user.trim().toLowerCase();
+
+if(u === "satakshi"){
+img.src = "images/satakshi.jpg";
 }
 
-else if(username === "Member2"){
-    img.src = "images/member2.png";
+else if(u === "member1"){
+img.src = "images/member1.png";
 }
 
-else if(username === "Member3"){
-    img.src = "images/member3.png";
+else if(u === "member2"){
+img.src = "images/member2.png";
 }
 
-else if(username === "Member4"){
-    img.src = "images/member4.png";
+else if(u === "member3"){
+img.src = "images/member3.png";
+}
+
 }
 
 // LOAD TASKS
