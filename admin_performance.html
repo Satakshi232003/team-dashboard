@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Team Performance</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins;
+}
+
+body{
+display:flex;
+background:#0f172a;
+color:white;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:230px;
+height:100vh;
+background:#020617;
+padding:25px;
+position:fixed;
+}
+
+.sidebar h2{
+margin-bottom:35px;
+}
+
+.sidebar a{
+display:block;
+padding:12px;
+color:#cbd5e1;
+text-decoration:none;
+margin-bottom:8px;
+border-radius:8px;
+}
+
+.sidebar a:hover{
+background:#1e293b;
+color:white;
+}
+
+.sidebar button{
+margin-top:20px;
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+background:#ef4444;
+color:white;
+cursor:pointer;
+}
+
+/* MAIN */
+
+.main{
+margin-left:230px;
+padding:30px;
+width:100%;
+}
+
+/* HEADER */
+
+.header{
+margin-bottom:30px;
+}
+
+.header h1{
+font-size:28px;
+}
+
+/* TABLE */
+
+.table-box{
+background:#1e293b;
+padding:25px;
+border-radius:12px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+text-align:left;
+padding:12px;
+color:#94a3b8;
+border-bottom:1px solid #334155;
+}
+
+td{
+padding:12px;
+border-bottom:1px solid #334155;
+}
+
+.progress{
+background:#334155;
+border-radius:20px;
+height:8px;
+overflow:hidden;
+}
+
+.progress-bar{
+height:8px;
+background:#22c55e;
+}
+
+.no-data{
+text-align:center;
+padding:20px;
+color:#94a3b8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>Project</h2>
+
+<a href="dashboard.html">🏠 Dashboard</a>
+<a href="assign_task.html">📌 Assign Task</a>
+<a href="my_tasks.html">✔ My Tasks</a>
+<a href="daily_update.html">📝 Daily Updates</a>
+<a href="project_files.html">📁 Project Files</a>
+<a href="admin_performance.html">📊 Performance</a>
+<a href="team.html">👥 Team Members</a>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+<div class="header">
+<h1>Team Performance</h1>
+</div>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Member</th>
+<th>Total Tasks</th>
+<th>Completed</th>
+<th>Pending</th>
+<th>Progress</th>
+</tr>
+
+</thead>
+
+<tbody id="performanceList">
+
+<tr>
+<td colspan="5" class="no-data">Loading...</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+var scriptURL="https://script.google.com/macros/s/AKfycbw9BIHeWBwXOfeZ85AevN2RK4JI6y8NDtvZ2gya2LXy2qzl2N71hmLXhl0qJBRPH_R_qQ/exec";
+
+
+// LOAD PERFORMANCE DATA
+var user = localStorage.getItem("username");
+
+fetch(scriptURL+"?action=performance&username="+user)
+.then(response => response.json())
+.then(data => {
+
+let html=""
+
+if(data.length === 0){
+
+html=`<tr><td colspan="5" class="no-data">No Performance Data Found</td></tr>`
+
+}else{
+
+data.forEach(p=>{
+
+let percent = p.percent || 0
+
+html+=`
+
+<tr>
+
+<td>${p.user}</td>
+
+<td>${p.total}</td>
+
+<td>${p.completed}</td>
+
+<td>${p.pending}</td>
+
+<td>
+
+<div class="progress">
+<div class="progress-bar" style="width:${percent}%"></div>
+</div>
+
+${percent}%
+
+</td>
+
+</tr>
+
+`
+
+})
+
+}
+
+document.getElementById("performanceList").innerHTML=html
+
+})
+.catch(error=>{
+
+document.getElementById("performanceList").innerHTML=
+`<tr><td colspan="5" class="no-data">Error Loading Data</td></tr>`
+
+console.error(error)
+
+})
+
+
+// LOGOUT
+
+function logout(){
+
+var user = localStorage.getItem("username");
+
+if(user){
+
+fetch(scriptURL+"?action=logout&username="+user);
+
+}
+
+localStorage.removeItem("username");
+
+window.location.href="login.html";
+
+}
+
+</script>
+
+</body>
+</html>

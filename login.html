@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Login</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#4facfe,#00f2fe);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.box{
+background:white;
+padding:40px;
+border-radius:12px;
+width:350px;
+text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+input{
+width:90%;
+padding:12px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+button{
+background:#4facfe;
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:6px;
+cursor:pointer;
+font-size:16px;
+}
+
+button:hover{
+background:#2c8ef4;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Login</h2>
+
+<input type="text" id="loginUser" placeholder="Username" autocomplete="off">
+
+<input type="password" id="loginPass" placeholder="Password" autocomplete="new-password">
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+
+</div>
+<script>
+
+var scriptURL="https://script.google.com/macros/s/AKfycbw9BIHeWBwXOfeZ85AevN2RK4JI6y8NDtvZ2gya2LXy2qzl2N71hmLXhl0qJBRPH_R_qQ/exec";
+
+function login(){
+
+var user=document.getElementById("loginUser").value.trim();
+var pass=document.getElementById("loginPass").value.trim();
+
+// ADMIN LOGIN
+if(user=="admin" && pass=="123"){
+
+document.getElementById("msg").innerHTML="Admin Login Successful 👑";
+
+setTimeout(function(){
+window.location.href="dashboard.html";
+},1000);
+
+return;
+}
+
+// API LOGIN VERIFY
+fetch(scriptURL+"?action=login&username="+user+"&password="+pass)
+
+.then(res=>res.text())
+
+.then(data=>{
+
+if(data=="success"){
+
+localStorage.setItem("username",user);
+
+document.getElementById("msg").innerHTML="Login Successful 🎉";
+
+
+
+setTimeout(function(){
+window.location.href="dashboard.html";
+},1000);
+
+}
+
+else{
+
+document.getElementById("msg").innerHTML="Invalid Username or Password ❌";
+
+}
+
+})
+
+.catch(error=>{
+
+document.getElementById("msg").innerHTML="Server Error ❌";
+
+});
+
+}
+
+</script>
+</body>
+</html>

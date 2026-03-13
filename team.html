@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Team</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins;
+}
+
+body{
+display:flex;
+background:#f4f7fb;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:230px;
+height:100vh;
+background:linear-gradient(180deg,#0f2027,#203a43,#2c5364);
+color:white;
+position:fixed;
+padding:25px;
+}
+
+.sidebar h2{
+margin-bottom:30px;
+text-align:center;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+padding:12px;
+margin:8px 0;
+border-radius:8px;
+transition:0.3s;
+}
+
+.sidebar a:hover{
+background:rgba(255,255,255,0.15);
+padding-left:18px;
+}
+
+.sidebar button{
+margin-top:30px;
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+background:#ff4d4d;
+color:white;
+cursor:pointer;
+}
+
+/* MAIN */
+
+.main{
+margin-left:230px;
+padding:30px;
+width:100%;
+}
+
+/* HEADER */
+
+.header{
+background:linear-gradient(90deg,#4facfe,#00f2fe);
+padding:20px;
+border-radius:10px;
+color:white;
+margin-bottom:30px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* TEAM GRID */
+
+.team-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+}
+
+.member{
+background:white;
+padding:25px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+transition:0.3s;
+}
+
+.member:hover{
+transform:translateY(-5px);
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.avatar{
+font-size:40px;
+margin-bottom:10px;
+}
+
+.name{
+font-weight:600;
+font-size:18px;
+}
+
+.role{
+font-size:13px;
+color:gray;
+margin-top:5px;
+}
+
+.badge{
+background:#22c55e;
+color:white;
+font-size:12px;
+padding:3px 8px;
+border-radius:50px;
+margin-left:6px;
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>Team Panel</h2>
+
+<a href="dashboard.html">🏠 Dashboard</a>
+<a href="assign_task.html">📌 Assign Task</a>
+<a href="my_tasks.html">📋 My Tasks</a>
+<a href="daily_update.html">📝 Daily Update</a>
+<a href="admin_performance.html">📊 Performance</a>
+<a href="team.html">👥 Team</a>
+<a href="messages.html">
+💬 Messages 
+<span id="msgCount" class="badge">0</span>
+</a>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+<div class="header">
+<h1>Team Members</h1>
+</div>
+
+<div class="team-grid">
+
+<div class="member">
+<div class="avatar">👨‍💻</div>
+<div class="name">Rahul</div>
+<div class="role">Frontend Developer</div>
+</div>
+
+<div class="member">
+<div class="avatar">👨‍💻</div>
+<div class="name">Ankit</div>
+<div class="role">Backend Developer</div>
+</div>
+
+<div class="member">
+<div class="avatar">👩‍💻</div>
+<div class="name">Pooja</div>
+<div class="role">UI Designer</div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+var scriptURL="https://script.google.com/macros/s/AKfycbw9BIHeWBwXOfeZ85AevN2RK4JI6y8NDtvZ2gya2LXy2qzl2N71hmLXhl0qJBRPH_R_qQ/exec";
+
+function logout(){
+
+var user = localStorage.getItem("username");
+
+if(user){
+
+fetch(scriptURL+"?action=logout&username="+user);
+
+}
+
+localStorage.removeItem("username");
+
+window.location.href="login.html";
+
+var scriptURL="https://script.google.com/macros/s/AKfycbw9BIHeWBwXOfeZ85AevN2RK4JI6y8NDtvZ2gya2LXy2qzl2N71hmLXhl0qJBRPH_R_qQ/exec";
+
+var username = localStorage.getItem("username");
+
+var lastSeenTime = localStorage.getItem("lastSeenTime") || "";
+
+
+function checkMessages(){
+
+fetch(scriptURL+"?action=getMessages")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+if(data.length==0) return
+
+let last=data[data.length-1]
+
+if(last.user!=username){
+
+if(last.time!=lastSeenTime){
+
+document.getElementById("msgCount").style.display="inline-block"
+document.getElementById("msgCount").innerText="1"
+
+}
+
+}
+
+})
+
+}
+
+checkMessages()
+
+setInterval(checkMessages,5000)
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Project Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins;
+}
+
+body{
+display:flex;
+background:#0f172a;
+color:white;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:230px;
+height:100vh;
+background:#020617;
+padding:25px;
+position:fixed;
+}
+
+.sidebar h2{
+margin-bottom:35px;
+}
+
+.sidebar a{
+display:block;
+padding:12px;
+color:#cbd5e1;
+text-decoration:none;
+margin-bottom:8px;
+border-radius:8px;
+}
+
+.sidebar a:hover{
+background:#1e293b;
+color:white;
+}
+
+/* MAIN */
+
+.main{
+margin-left:230px;
+padding:25px;
+width:100%;
+}
+
+/* TOPBAR */
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+}
+
+.search{
+width:320px;
+padding:10px;
+border-radius:20px;
+border:none;
+background:#1e293b;
+color:white;
+}
+
+.profile{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.profile img{
+width:35px;
+height:35px;
+border-radius:50%;
+}
+
+/* CARDS */
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:20px;
+margin-bottom:30px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+}
+
+.card h3{
+color:#94a3b8;
+margin-bottom:10px;
+}
+
+/* SECTIONS */
+
+.grid{
+display:grid;
+grid-template-columns:2fr 2fr;
+gap:20px;
+margin-bottom:20px;
+}
+
+.box{
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+}
+
+.task{
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid #334155;
+}
+
+.file-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+margin-top:15px;
+}
+
+.file{
+background:#0f172a;
+padding:15px;
+border-radius:10px;
+text-align:center;
+}
+
+.file a{
+color:white;
+text-decoration:none;
+}
+
+.feed{
+padding:10px 0;
+border-bottom:1px solid #334155;
+font-size:14px;
+}
+
+.badge{
+background:#22c55e;
+color:white;
+font-size:12px;
+padding:3px 8px;
+border-radius:50px;
+margin-left:6px;
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>Project</h2>
+
+<a href="dashboard.html">🏠 Dashboard</a>
+<a href="my_tasks.html">✔ My Tasks</a>
+<a href="project_files.html">📁 Project Files</a>
+<a href="daily_update.html">📝 Daily Updates</a>
+<a href="team.html">👥 Team Members</a>
+<a href="messages.html">
+💬 Messages 
+<span id="msgCount" class="badge">0</span>
+</a>
+<a href="#" onclick="logout()">🚪 Logout</a>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+<div class="topbar">
+
+<input class="search" placeholder="Search...">
+
+<div class="profile">
+
+<img id="userPhoto" src="">
+
+<span id="username">User</span>
+
+</div>
+
+</div>
+
+<h2 style="margin-bottom:20px;">Welcome to Project Dashboard!</h2>
+
+
+<!-- CARDS -->
+
+<div class="cards">
+
+<div class="card">
+<h3>Progress</h3>
+<h1>65%</h1>
+<p>Complete</p>
+</div>
+
+<div class="card">
+<h3>Due Date</h3>
+<p>Deadline: 15 May 2024</p>
+</div>
+
+<div class="card">
+<h3>Files to Review</h3>
+<h2>8 Files Pending</h2>
+</div>
+
+<div class="card">
+<h3>Team Members</h3>
+<h2>5 Members Online</h2>
+</div>
+
+</div>
+
+
+<!-- TASKS + FILES -->
+
+<div class="grid">
+
+<div class="box">
+
+<h3>My Tasks</h3>
+
+<div id="taskList"></div>
+
+</div>
+
+
+<div class="box">
+
+<h3>Project Files</h3>
+
+<div class="file-grid" id="fileList"></div>
+
+</div>
+
+</div>
+
+
+<!-- ACTIVITY + UPDATES -->
+
+<div class="grid">
+
+<div class="box">
+
+<h3>Activity Feed</h3>
+
+<div class="feed">Amit uploaded Budget Sheet.xlsx</div>
+<div class="feed">Priya completed Fix Login Bug</div>
+<div class="feed">Ravi commented on UI Design</div>
+
+</div>
+
+<div class="box">
+
+<h3>Latest Updates</h3>
+
+<div class="feed">Discussed timeline with client</div>
+<div class="feed">Reviewed new UI design</div>
+<div class="feed">Team meeting scheduled for Friday</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+var scriptURL="https://script.google.com/macros/s/AKfycbw9BIHeWBwXOfeZ85AevN2RK4JI6y8NDtvZ2gya2LXy2qzl2N71hmLXhl0qJBRPH_R_qQ/exec"
+
+let user = localStorage.getItem("username")
+
+if(user){
+document.getElementById("username").innerHTML=user
+}
+
+
+// LOAD USER PHOTO
+
+fetch(scriptURL+"?action=profile&username="+user)
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("userPhoto").src=data.photo
+})
+
+
+// LOAD TASKS
+
+fetch(scriptURL+"?action=tasks&username="+user)
+.then(res=>res.json())
+.then(data=>{
+
+let html=""
+
+data.forEach(t=>{
+html+=`
+<div class="task">
+<span>${t.task}</span>
+<span>Due: ${t.due}</span>
+</div>
+`
+})
+
+document.getElementById("taskList").innerHTML=html
+
+})
+
+
+// LOAD FILES
+
+fetch(scriptURL+"?action=files&username="+user)
+.then(res=>res.json())
+.then(data=>{
+
+let html=""
+
+data.forEach(f=>{
+html+=`
+<div class="file">
+<a href="${f.link}" target="_blank">
+${f.name}<br>${f.size}
+</a>
+</div>
+`
+})
+
+document.getElementById("fileList").innerHTML=html
+
+})
+
+
+// MESSAGE NOTIFICATION SYSTEM
+
+var lastSeen = localStorage.getItem("lastSeenMessage") || ""
+
+function checkMessages(){
+
+fetch(scriptURL+"?action=getMessages")
+.then(res=>res.json())
+.then(data=>{
+
+if(data.length==0) return
+
+let last=data[data.length-1]
+
+if(last.user!=user){
+
+if(last.time!=lastSeen){
+
+document.getElementById("msgCount").style.display="inline-block"
+document.getElementById("msgCount").innerText="1"
+
+}
+
+}
+
+})
+
+}
+
+// FAST LOAD ON PAGE OPEN
+checkMessages()
+
+// AUTO CHECK EVERY 3 SEC
+setInterval(checkMessages,3000)
+
+
+
+function logout(){
+
+localStorage.removeItem("username")
+
+window.location.href="login.html"
+
+}
+
+</script>
+</body>
+</html>

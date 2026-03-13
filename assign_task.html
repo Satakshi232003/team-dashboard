@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Assign Task</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins;
+}
+
+body{
+display:flex;
+background:#0f172a;
+color:white;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:230px;
+height:100vh;
+background:#020617;
+padding:25px;
+position:fixed;
+}
+
+.sidebar h2{
+margin-bottom:35px;
+}
+
+.sidebar a{
+display:block;
+padding:12px;
+color:#cbd5e1;
+text-decoration:none;
+margin-bottom:8px;
+border-radius:8px;
+}
+
+.sidebar a:hover{
+background:#1e293b;
+color:white;
+}
+
+.sidebar button{
+margin-top:20px;
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+background:#ef4444;
+color:white;
+cursor:pointer;
+}
+
+/* MAIN */
+
+.main{
+margin-left:230px;
+padding:30px;
+width:100%;
+}
+
+/* HEADER */
+
+.header{
+margin-bottom:30px;
+}
+
+.header h1{
+font-size:28px;
+}
+
+/* FORM BOX */
+
+.form-box{
+background:#1e293b;
+padding:30px;
+border-radius:12px;
+width:420px;
+}
+
+.form-box input,
+.form-box select{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:8px;
+background:#0f172a;
+color:white;
+}
+
+.form-box button{
+width:100%;
+padding:12px;
+border:none;
+background:#3b82f6;
+color:white;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;
+}
+
+.form-box button:hover{
+background:#2563eb;
+}
+
+#msg{
+margin-top:10px;
+color:#22c55e;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>Project</h2>
+
+<a href="dashboard.html">🏠 Dashboard</a>
+<a href="assign_task.html">📌 Assign Task</a>
+<a href="my_tasks.html">✔ My Tasks</a>
+<a href="daily_update.html">📝 Daily Updates</a>
+<a href="team.html">👥 Team Members</a>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+<div class="header">
+
+<h1>Assign Task</h1>
+
+</div>
+
+<div class="form-box">
+
+<input id="taskTitle" placeholder="Task Title">
+
+<select id="member"></select>
+
+<input type="date" id="deadline">
+
+<button onclick="assignTask()">Assign Task</button>
+
+<p id="msg"></p>
+
+</div>
+
+</div>
+
+<script>
+
+var scriptURL="https://script.google.com/macros/s/AKfycbw9BIHeWBwXOfeZ85AevN2RK4JI6y8NDtvZ2gya2LXy2qzl2N71hmLXhl0qJBRPH_R_qQ/exec";
+
+
+// LOAD TEAM MEMBERS FROM SHEET
+
+fetch(scriptURL+"?action=members")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let html=""
+
+data.forEach(m=>{
+
+html+=`<option value="${m.username}">${m.username}</option>`
+
+})
+
+document.getElementById("member").innerHTML=html
+
+})
+
+
+// ASSIGN TASK
+
+function assignTask(){
+
+var title=document.getElementById("taskTitle").value
+var member=document.getElementById("member").value
+var deadline=document.getElementById("deadline").value
+
+fetch(scriptURL+"?action=assign&user="+member+"&task="+title+"&due="+deadline)
+
+.then(res=>res.text())
+
+.then(data=>{
+
+document.getElementById("msg").innerHTML="Task Assigned Successfully"
+
+document.getElementById("taskTitle").value=""
+document.getElementById("deadline").value=""
+
+})
+
+}
+
+
+// LOGOUT
+
+function logout(){
+
+var user = localStorage.getItem("username");
+
+if(user){
+
+fetch(scriptURL+"?action=logout&username="+user);
+
+}
+
+localStorage.removeItem("username");
+
+window.location.href="login.html";
+
+}
+
+</script>
+
+</body>
+</html>

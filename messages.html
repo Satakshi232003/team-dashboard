@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Team Chat</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins;
+}
+
+body{
+display:flex;
+background:#0f172a;
+color:white;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:230px;
+height:100vh;
+background:#020617;
+padding:25px;
+position:fixed;
+}
+
+.sidebar a{
+display:block;
+padding:12px;
+color:#cbd5e1;
+text-decoration:none;
+margin-bottom:8px;
+border-radius:8px;
+}
+
+.sidebar a:hover{
+background:#1e293b;
+color:white;
+}
+
+.sidebar button{
+margin-top:20px;
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+background:#ef4444;
+color:white;
+cursor:pointer;
+}
+
+/* MAIN */
+
+.main{
+margin-left:230px;
+width:100%;
+display:flex;
+flex-direction:column;
+height:100vh;
+}
+
+/* HEADER */
+
+.header{
+background:#1e293b;
+padding:15px;
+font-size:20px;
+}
+
+/* CHAT AREA */
+
+.chat-box{
+flex:1;
+padding:20px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:12px;
+background-image:url("https://i.imgur.com/6IUBKXG.png");
+background-size:cover;
+}
+
+/* MESSAGE */
+
+.message{
+padding:10px 14px;
+border-radius:10px;
+max-width:60%;
+font-size:14px;
+}
+
+.me{
+background:#22c55e;
+align-self:flex-end;
+color:white;
+}
+
+.other{
+background:#1e293b;
+align-self:flex-start;
+}
+
+.username{
+font-size:11px;
+opacity:0.7;
+margin-bottom:3px;
+}
+
+.time{
+font-size:10px;
+opacity:0.6;
+text-align:right;
+margin-top:4px;
+}
+
+/* INPUT */
+
+.chat-input{
+display:flex;
+padding:15px;
+background:#1e293b;
+}
+
+.chat-input input{
+flex:1;
+padding:12px;
+border:none;
+border-radius:8px;
+margin-right:10px;
+}
+
+.chat-input button{
+padding:12px 20px;
+border:none;
+border-radius:8px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+}
+
+/* MESSAGE BADGE */
+
+.badge{
+background:#22c55e;
+color:white;
+font-size:12px;
+padding:3px 7px;
+border-radius:50px;
+margin-left:6px;
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>Project</h2>
+
+<a href="dashboard.html">🏠 Dashboard</a>
+
+<a href="messages.html">
+💬 Messages
+<span id="msgCount" class="badge">0</span>
+</a>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<div class="main">
+
+<div class="header">
+Team Group Chat
+</div>
+
+<div class="chat-box" id="chatBox"></div>
+
+<div class="chat-input">
+
+<input id="msg" placeholder="Type message... 😊">
+
+<button onclick="sendMessage()">Send</button>
+
+</div>
+
+</div>
+
+<script>
+
+var scriptURL="https://script.google.com/macros/s/AKfycbw9BIHeWBwXOfeZ85AevN2RK4JI6y8NDtvZ2gya2LXy2qzl2N71hmLXhl0qJBRPH_R_qQ/exec";
+
+var username = localStorage.getItem("username");
+
+var lastMessageTime="";
+var unreadCount=0;
+
+
+// RESET BADGE WHEN CHAT OPEN
+localStorage.setItem("unreadMessages",0)
+document.getElementById("msgCount").style.display="none"
+
+
+// ASK NOTIFICATION PERMISSION
+if(Notification.permission!=="granted"){
+Notification.requestPermission()
+}
+
+
+function loadMessages(){
+
+fetch(scriptURL+"?action=getMessages")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let html=""
+
+data.forEach(m=>{
+
+let type=m.user===username ? "me":"other"
+
+html+=`
+
+<div class="message ${type}">
+
+<div class="username">${m.user}</div>
+
+<div>${m.message}</div>
+
+<div class="time">${m.time}</div>
+
+</div>
+
+`
+
+})
+
+let box=document.getElementById("chatBox")
+
+box.innerHTML=html
+
+box.scrollTop=box.scrollHeight
+
+
+// CHECK NEW MESSAGE
+if(data.length>0){
+
+let last=data[data.length-1]
+
+if(last.time!=lastMessageTime && last.user!=username){
+
+showNotification(last.user,last.message)
+
+// INCREASE BADGE
+unreadCount++
+
+document.getElementById("msgCount").innerText=unreadCount
+document.getElementById("msgCount").style.display="inline-block"
+
+// SAVE FOR DASHBOARD
+localStorage.setItem("unreadMessages",unreadCount)
+
+}
+
+lastMessageTime=last.time
+
+}
+
+})
+
+}
+
+
+function sendMessage(){
+
+let msg=document.getElementById("msg").value.trim()
+
+if(msg=="") return
+
+fetch(scriptURL+"?action=sendMessage&username="+username+"&message="+encodeURIComponent(msg))
+
+.then(()=>{
+
+document.getElementById("msg").value=""
+
+loadMessages()
+
+})
+
+}
+
+
+function showNotification(user,msg){
+
+if(Notification.permission==="granted"){
+
+new Notification(user+" says:",{
+body:msg,
+icon:"https://cdn-icons-png.flaticon.com/512/733/733585.png"
+})
+
+}
+
+}
+
+
+setInterval(loadMessages,2000)
+
+loadMessages()
+
+
+document.getElementById("msg").addEventListener("keypress",function(e){
+
+if(e.key==="Enter"){
+sendMessage()
+}
+
+})
+
+
+function logout(){
+
+fetch(scriptURL+"?action=logout&username="+username)
+
+localStorage.removeItem("username")
+
+window.location.href="login.html"
+
+}
+
+</script>
+
+</body>
+</html>
