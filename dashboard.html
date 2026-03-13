@@ -314,21 +314,13 @@ if(user){
 
 let u = user.trim().toLowerCase();
 
-if(u === "satakshi"){
-img.src = "images/satakshi.jpg";
-}
+// try jpg first
+img.src = "images/" + u + ".jpg";
 
-else if(u === "member1"){
-img.src = "images/member1.png";
-}
-
-else if(u === "member2"){
-img.src = "images/member2.png";
-}
-
-else if(u === "member3"){
-img.src = "images/member3.png";
-}
+// if jpg not found load png
+img.onerror = function(){
+img.src = "images/" + u + ".png";
+};
 
 }
 
